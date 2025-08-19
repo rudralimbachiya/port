@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rudra • Portfolio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+    
+    html {
+      scroll-behavior: auto;
+    }
+
+    /* Hero Section with Centered Donut */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+    }
+
+    /* Parallax Background Donut */
+    #donutCanvas {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Smooth scroll container */
+    .scroll-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .scroll-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      will-change: transform;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      margin-top: 300px;
+      background: rgba(10, 10, 10, 0.2);
+      backdrop-filter: blur(15px) saturate(150%);
+      padding: 4rem;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeInUp 1.5s ease forwards 0.5s;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: #888;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeInUp 1.5s ease forwards 0.8s;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #555;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      opacity: 0;
+      animation: fadeInUp 1.5s ease forwards 1.1s;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem 4rem;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.3);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+    }
+
+    nav a {
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    nav a:hover {
+      color: #fff;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: #fff;
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    /* Content Sections */
+    section {
+      min-height: 100vh;
+      padding: 8rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      background: rgba(10, 10, 10, 0.25);
+      backdrop-filter: blur(20px) saturate(150%);
+      border-radius: 24px;
+      margin-bottom: 4rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    section:not(.hero) {
+      margin-top: 4rem;
+    }
+
+    section h2 {
+      font-size: 3rem;
+      font-weight: 300;
+      margin-bottom: 2rem;
+      letter-spacing: -0.01em;
+    }
+
+    section p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #bbb;
+      max-width: 700px;
+    }
+
+    .section-number {
+      font-size: 1rem;
+      color: #444;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      margin-bottom: 1rem;
+    }
+
+    /* Grid Layout for Work Section */
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .work-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2.5rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .work-item:hover {
+      transform: translateY(-8px);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .work-item h3 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .work-item p {
+      font-size: 0.95rem;
+      color: #888;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      nav {
+        padding: 1rem 2rem;
+      }
+      
+      nav ul {
+        gap: 1.5rem;
+      }
+      
+      section {
+        padding: 4rem 2rem;
+      }
+      
+      section h2 {
+        font-size: 2rem;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Smooth scroll offset for fixed nav */
+    html {
+      scroll-padding-top: 100px;
+    }
+
+    /* Custom smooth scrolling */
+    .smooth-scroll {
+      scroll-behavior: auto;
+    }
+
+    /* Enhanced container for smoother experience */
+    .content-container {
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="donutCanvas"></canvas>
+  
+  <div class="scroll-container">
+    <div class="scroll-content">
+      <nav>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#vision">Vision</a></li>
+          <li><a href="#work">Work</a></li>
+          <li><a href="#passion">Passion</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <section class="hero">
+        <div class="hero-content">
+          <h1>RUDRA</h1>
+          <p>Building the future with code</p>
+        </div>
+        <div class="scroll-indicator">SCROLL TO EXPLORE</div>
+      </section>
+
+  <section id="about">
+    <div class="section-number">01</div>
+    <h2>About</h2>
+    <p>I'm Rudra, a 16-year-old developer passionate about creating innovative solutions through technology. My journey began with curiosity about how things work, and has evolved into a deep fascination with artificial intelligence, systems design, and the intersection of technology and human experience.</p>
+  </section>
+
+  <section id="vision">
+    <div class="section-number">02</div>
+    <h2>Vision</h2>
+    <p>I envision a world where technology seamlessly integrates with human needs, making complex systems accessible and intuitive. My goal is to build AI-driven solutions that not only solve problems but also enhance the way we interact with the digital world, making technology more human-centered and globally accessible.</p>
+  </section>
+
+  <section id="work">
+    <div class="section-number">03</div>
+    <h2>Work</h2>
+    <p>From experimental code to production-ready applications, here's what I've been building:</p>
+    <div class="work-grid">
+      <div class="work-item">
+        <h3>AI-Powered Tools</h3>
+        <p>Developing intelligent systems that automate complex workflows and enhance productivity through machine learning algorithms.</p>
+      </div>
+      <div class="work-item">
+        <h3>Web Applications</h3>
+        <p>Creating responsive, modern web experiences with focus on performance, accessibility, and user-centered design.</p>
+      </div>
+      <div class="work-item">
+        <h3>Open Source</h3>
+        <p>Contributing to the developer community through open-source projects and collaborative coding initiatives.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="passion">
+    <div class="section-number">04</div>
+    <h2>Passion</h2>
+    <p>What drives me is the endless possibility of code to transform ideas into reality. I'm passionate about problem-solving, creating tools that make life easier, and exploring the boundaries of what's possible with technology. Whether it's automating mundane tasks or building complex systems, I find joy in the process of creation and continuous learning.</p>
+  </section>
+
+  <section id="contact">
+    <div class="section-number">05</div>
+    <h2>Let's Connect</h2>
+    <p>I'm always interested in discussing new ideas, collaborating on projects, or simply connecting with fellow developers and innovators. Feel free to reach out if you'd like to chat about technology, opportunities, or anything in between.</p>
+  </section>
+
+  <script>
+    const canvas = document.getElementById("donutCanvas");
+    const ctx = canvas.getContext("2d");
+    
+    // Set canvas size
+    const canvasSize = Math.min(window.innerWidth * 0.9, 900);
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
+    
+    let A = 0, B = 0;
+    let currentScrollY = 0;
+    let targetScrollY = 0;
+    let scrollSpeed = 0;
+    
+    // Smooth scroll implementation like Dorian's site
+    const scrollContainer = document.querySelector('.scroll-container');
+    const scrollContent = document.querySelector('.scroll-content');
+    
+    // Set up scroll height
+    function updateScrollHeight() {
+      const contentHeight = scrollContent.offsetHeight;
+      document.body.style.height = contentHeight + 'px';
+    }
+    
+    updateScrollHeight();
+    window.addEventListener('resize', updateScrollHeight);
+    
+    // Smooth scroll animation with delay/inertia
+    function smoothScrollAnimation() {
+      targetScrollY = window.pageYOffset;
+      
+      // Smooth interpolation with easing
+      const ease = 0.08;
+      currentScrollY += (targetScrollY - currentScrollY) * ease;
+      
+      // Calculate scroll speed for donut acceleration
+      scrollSpeed = Math.abs(targetScrollY - currentScrollY) * 0.01;
+      
+      // Apply transform to content
+      scrollContent.style.transform = `translate3d(0, ${-currentScrollY}px, 0)`;
+      
+      requestAnimationFrame(smoothScrollAnimation);
+    }
+    
+    smoothScrollAnimation();
+    
+    const asciiframe = () => {
+      const b = [];
+      const z = [];
+      const width = 100;
+      const height = 50;
+      
+      // Initialize arrays
+      for (let k = 0; k < width * height; k++) {
+        b[k] = ' ';
+        z[k] = 0;
+      }
+      
+      // Base slow rotation + scroll acceleration
+      const baseRotationSpeed = 0.008;
+      const scrollAcceleration = Math.min(scrollSpeed * 2, 0.05);
+      
+      // Generate donut with dynamic rotation speed
+      for (let j = 0; j < 6.28; j += 0.035) {
+        for (let i = 0; i < 6.28; i += 0.01) {
+          const c = Math.sin(i);
+          const d = Math.cos(j);
+          const e = Math.sin(A);
+          const f = Math.sin(j);
+          const g = Math.cos(A);
+          const h = d + 2;
+          const D = 1 / (c * h * e + f * g + 5);
+          const l = Math.cos(i);
+          const m = Math.cos(B);
+          const n = Math.sin(B);
+          const t = c * h * g - f * e;
+          
+          const x = Math.floor(width / 2 + width * 0.45 * D * (l * h * m - t * n));
+          const y = Math.floor(height / 2 + height * 0.45 * D * (l * h * n + t * m));
+          const o = x + width * y;
+          
+          const N = Math.floor(8 * ((f * e - c * d * g) * m - c * d * e - f * g - l * d * n));
+          
+          if (height > y && y > 0 && x > 0 && width > x && D > z[o]) {
+            z[o] = D;
+            b[o] = ".,-~:;=!*#$@"[Math.max(N, 0)] || ' ';
+          }
+        }
+      }
+      
+      // Clear canvas
+      ctx.fillStyle = "transparent";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw ASCII donut with enhanced visibility
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "16px 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      
+      const charWidth = 9;
+      const charHeight = 18;
+      const startX = (canvas.width - (width * charWidth)) / 2;
+      const startY = (canvas.height - (height * charHeight)) / 2;
+      
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const char = b[x + width * y];
+          if (char && char !== ' ') {
+            // Enhanced opacity with better depth perception
+            const intensity = ".,-~:;=!*#$@".indexOf(char) / 11;
+            ctx.globalAlpha = 0.4 + intensity * 0.6;
+            ctx.fillText(char, startX + x * charWidth, startY + y * charHeight);
+          }
+        }
+      }
+      
+      ctx.globalAlpha = 1;
+      
+      // Dynamic rotation: slow base + scroll acceleration
+      A += baseRotationSpeed + scrollAcceleration;
+      B += (baseRotationSpeed + scrollAcceleration) * 0.7;
+    };
+
+    // Start animation at 60fps
+    setInterval(asciiframe, 16);
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      const newSize = Math.min(window.innerWidth * 0.9, 900);
+      canvas.width = newSize;
+      canvas.height = newSize;
+      updateScrollHeight();
+    });
+
+    // Enhanced navigation scroll with momentum
+    document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          const targetPosition = target.offsetTop - 100;
+          
+          // Smooth scroll to target with custom easing
+          const startPosition = targetScrollY;
+          const distance = targetPosition - startPosition;
+          const duration = 1500;
+          let startTime = null;
+          
+          function smoothScrollTo(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            
+            // Advanced easing curve for premium feel
+            const easeInOutQuart = progress < 0.5 
+              ? 8 * progress * progress * progress * progress 
+              : 1 - Math.pow(-2 * progress + 2, 4) / 2;
+            
+            window.scrollTo(0, startPosition + distance * easeInOutQuart);
+            
+            if (progress < 1) {
+              requestAnimationFrame(smoothScrollTo);
+            }
+          }
+          
+          requestAnimationFrame(smoothScrollTo);
+        }
+      });
+    });
+
+    // Prevent default scroll behavior
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      window.scrollTo(0, window.pageYOffset + e.deltaY * 0.8);
+    }, { passive: false });
+  </script>
+</body>
+</html>
